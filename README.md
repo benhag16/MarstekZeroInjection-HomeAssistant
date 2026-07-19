@@ -48,7 +48,6 @@ neuer Sollwert = alter Sollwert + Faktor × (Netzleistung − Ziel)
    ```yaml
    homeassistant:
      packages:
-       modbus_sungrow: !include integrations/modbus_sungrow.yaml
        nulleinspeisung: !include integrations/nulleinspeisung.yaml
    ```
 
