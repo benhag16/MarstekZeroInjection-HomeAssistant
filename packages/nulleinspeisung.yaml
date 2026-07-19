@@ -8,7 +8,7 @@
 # >>> ANPASSEN: Diese Entity-IDs muessen zu deinem System passen. <<<
 # Bei Abweichungen: Suchen & Ersetzen in dieser Datei (alle Vorkommen).
 #   sensor.tasmota_e320_power_in                            Netzleistung in W (+ Bezug / - Einspeisung)
-#   sensor.pv_leistung                                      PV-Leistung in W
+#   sensor.pv_flintsbach_schupfa_energy_power                                      PV-Leistung in W
 #   switch.marstek_venus_modbus_rs485_steuermodus           RS485-Steuermodus
 #   select.marstek_venus_modbus_erzwungener_modus           Force Mode
 #   number.marstek_venus_modbus_ladeleistung_einstellen     Lade-Sollwert (W)
@@ -138,7 +138,7 @@ automation:
     max_exceeded: silent
     variables:
       netz_sensor: sensor.tasmota_e320_power_in
-      pv_sensor: sensor.pv_leistung
+      pv_sensor: sensor.pv_flintsbach_schupfa_energy_power
       soc_sensor: sensor.marstek_venus_modbus_soc_batterie
       force_select: select.marstek_venus_modbus_erzwungener_modus
       nr_laden: number.marstek_venus_modbus_ladeleistung_einstellen
