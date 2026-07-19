@@ -111,7 +111,7 @@ neuer Sollwert = alter Sollwert + Faktor × (Netzleistung − Ziel)
 |---|---|
 | Keine Zählerdaten > 120 s (WLAN/Tasmota weg) | Akku → Standby, Sollwert 0, Push-Meldung |
 | Marstek per Modbus > 60 s nicht erreichbar | Sollwert 0, Push-Meldung |
-| RS485-Steuermodus deaktiviert sich selbst | Push-Meldung (bekanntes Firmware-Verhalten, Schalter manuell wieder einschalten) |
+| RS485-Steuermodus deaktiviert sich selbst (auch nach Verbindungsabriss) | wird automatisch wieder eingeschaltet, Sollwert 0, Start in Standby, Push-Meldung |
 | Zählerdaten wieder da (30 s stabil) | Push-Meldung, Regler läuft automatisch weiter |
 | HA-Neustart | Sollwert 0, Akku → Standby, dann normale Regelung |
 | Master-Schalter aus | Akku → Standby |
@@ -125,6 +125,25 @@ ins Netz bzw. lädt aus dem Netz, bis er die eigenen SoC-Grenzen erreicht.
 **Einspeisung ist nicht garantiert null:** Ist der Akku voll (oder der Überschuss
 größer als 2500 W), fließt der Rest ins Netz. Eine harte Null-Export-Garantie
 ginge nur über Drosselung des Wechselrichters.
+
+## Fehlersuche
+
+- **Akku reagiert nicht auf die Regelung:** Zuerst `sensor.nulleinspeisung_status`
+  prüfen — er nennt die blockierende Ursache („Störung: keine Zählerdaten",
+  „Störung: Akku nicht erreichbar", „Wartet: RS485-Modus aus"). Zeigt er
+  „Lädt/Entlädt", die Automation aber wirkt nicht, ist meist der
+  RS485-Steuermodus am Gerät ausgefallen oder die Modbus-Verbindung der
+  Integration hängt (Integration neu laden).
+- **Akku entlädt maximal ~800 W trotz höherem Sollwert:** Das Gerät hat neben
+  dem Entlade-Sollwert (Register 42021) ein eigenes Limit „Max allowed
+  discharge power" (Register 44003), das bei in Deutschland ausgelieferten
+  Geräten ab Werk auf 800 W steht (Balkonkraftwerk-Grenze). Dieses Limit kappt
+  jeden Sollwert gerätesetig — das Package kann es nicht übersteuern. Abhilfe:
+  in der Marstek-App die maximale Ausgangsleistung erhöhen oder die
+  Number-Entität `max_discharge_power` der Integration auf 2500 W setzen
+  (Entwicklerwerkzeuge → Entitäten, nach „Entladeleistung" suchen — es gibt
+  zwei: Sollwert und Maximum). Ob mehr als 800 W Ausgangsleistung für die
+  eigene Anlage zulässig ist (Anmeldung/Netzbetreiber), selbst prüfen.
 
 ## Inbetriebnahme-Tests
 

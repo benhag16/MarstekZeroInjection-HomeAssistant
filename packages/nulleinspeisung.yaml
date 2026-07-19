@@ -247,6 +247,7 @@ automation:
     max: 5
     variables:
       force_select: select.marstek_venus_modbus_erzwungener_modus
+      rs485_switch: switch.marstek_venus_modbus_rs485_steuermodus
       opt_standby: standby
     triggers:
       - trigger: state
@@ -258,9 +259,10 @@ automation:
         to: ["unavailable", "unknown"]
         for: "00:01:00"
         id: akku_weg
+      # Kein "from:", damit auch der Uebergang unavailable -> off erkannt wird
+      # (z. B. nach Netzwerkabriss, wenn der Akku ohne RS485-Modus zurueckkommt).
       - trigger: state
         entity_id: switch.marstek_venus_modbus_rs485_steuermodus
-        from: "on"
         to: "off"
         for: "00:00:05"
         id: rs485_aus
@@ -316,13 +318,29 @@ automation:
               - condition: trigger
                 id: rs485_aus
             sequence:
+              - action: input_number.set_value
+                target:
+                  entity_id: input_number.nulleinspeisung_sollwert
+                data:
+                  value: 0
+              - action: switch.turn_on
+                continue_on_error: true
+                target:
+                  entity_id: "{{ rs485_switch }}"
+              - delay: "00:00:02"
+              - action: select.select_option
+                continue_on_error: true
+                target:
+                  entity_id: "{{ force_select }}"
+                data:
+                  option: "{{ opt_standby }}"
               - action: notify.notify
                 data:
                   title: "Nulleinspeisung"
                   message: >-
-                    ⚠️ Der RS485-Steuermodus hat sich deaktiviert — die Regelung
-                    ist wirkungslos. Bitte den Schalter wieder einschalten
-                    (bekanntes Firmware-Verhalten).
+                    ⚠️ Der RS485-Steuermodus hatte sich deaktiviert (bekanntes
+                    Firmware-Verhalten) und wurde automatisch wieder
+                    eingeschaltet. Regelung startet in Standby neu.
           - conditions:
               - condition: trigger
                 id: zaehler_da
