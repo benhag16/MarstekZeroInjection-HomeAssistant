@@ -1,0 +1,40 @@
+# Lovelace-Karte "Nulleinspeisung"
+# Einfuegen ueber: Dashboard -> Bearbeiten -> Karte hinzufuegen -> Manuell -> YAML einfuegen
+type: vertical-stack
+cards:
+  - type: entities
+    title: Nulleinspeisung
+    state_color: true
+    entities:
+      - entity: input_boolean.nulleinspeisung_aktiv
+        name: Regelung aktiv
+      - entity: sensor.nulleinspeisung_status
+        name: Status
+      - type: divider
+      - entity: sensor.tasmota_e320_power_in
+        name: Netzleistung (+Bezug / −Einspeisung)
+      - entity: sensor.pv_leistung
+        name: PV-Leistung
+      - entity: input_number.nulleinspeisung_sollwert
+        name: Regler-Sollwert (+Entladen / −Laden)
+      - entity: sensor.marstek_venus_modbus_ac_leistung
+        name: Akku AC-Leistung
+      - entity: sensor.marstek_venus_modbus_soc_batterie
+        name: Akku SoC
+      - type: divider
+      - entity: binary_sensor.nulleinspeisung_messwerte_ok
+        name: Zählerdaten aktuell
+      - entity: switch.marstek_venus_modbus_rs485_steuermodus
+        name: RS485-Steuermodus
+      - entity: select.marstek_venus_modbus_erzwungener_modus
+        name: Force Mode
+  - type: history-graph
+    title: Regelgüte (Netzleistung um 0 W = gut)
+    hours_to_show: 6
+    entities:
+      - entity: sensor.tasmota_e320_power_in
+        name: Netzleistung
+      - entity: input_number.nulleinspeisung_sollwert
+        name: Sollwert
+      - entity: sensor.marstek_venus_modbus_ac_leistung
+        name: Akku-Leistung
